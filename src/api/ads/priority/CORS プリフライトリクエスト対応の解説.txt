@@ -1,0 +1,50 @@
+**CORS プリフライトリクエスト対応の解説：**
+
+**背景：**
+ブラウザは異なるドメイン間通信（CORS）で、実際のリクエスト前に「プリフライト」という事前確認を行います。
+
+**プリフライトとは：**
+```
+movieApp → adApp に GET リクエスト送信前
+ブラウザが自動で OPTIONS リクエストを先に送信
+「このドメインからGETできますか？」と確認
+```
+
+**コードの役割：**
+1. **OPTIONS応答**: プリフライト確認に「OK」で応答
+2. **Allow-Origin**: `echiechitube.net`からのアクセス許可
+3. **Allow-Methods**: GET, OPTIONSメソッド許可
+4. **Allow-Headers**: Content-Typeヘッダー使用許可
+5. **Max-Age**: 24時間キャッシュ（再確認不要）
+
+**実際の流れ：**
+```
+1. ブラウザ → adApp: OPTIONS (プリフライト)
+2. adApp → ブラウザ: 200 OK (許可)
+3. ブラウザ → adApp: GET (実際のリクエスト)
+```
+
+このOPTIONS関数がないと、CORS エラーでAPIアクセス失敗します。
+
+
+**CORSとプリフライトの適用範囲：**
+- **ブラウザ → API**: CORS制限あり、OPTIONS必須
+- **サーバー → API**: CORS制限なし、OPTIONS不要
+
+**理由：**
+CORSはブラウザのセキュリティ機能で、サーバー間通信には適用されません。
+
+**具体例：**
+```typescript
+// movieApp（サーバーサイド）から直接fetch
+const response = await fetch('https://adapp.com/api/ads/priority/random')
+// → 問題なし、OPTIONSなしでもOK
+
+// movieApp（クライアントサイド）からfetch  
+useEffect(() => {
+    fetch('https://adapp.com/api/ads/priority/random')
+    // → CORS制限、OPTIONS必須
+})
+```
+
+サーバーサイドならOriginチェックとOPTIONS関数は不要です。

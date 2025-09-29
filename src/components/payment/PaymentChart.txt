@@ -1,0 +1,512 @@
+'use client'
+// src/components/admin/payment/PaymentChart.tsx
+import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  ResponsiveContainer,
+  ComposedChart,
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Area,
+  AreaChart
+} from 'recharts'
+import { CreditCard, Receipt, DollarSign, TrendingUp, BarChart3 } from 'lucide-react'
+import { PaymentStatsData } from '@/lib/types/payment/paymentTypes'
+
+//////////
+//■[ チャートタイプ切り替え用 ]
+type ChartType = 'combined' | 'paymentCount' | 'totalAmount' | 'totalFees'
+
+//////////
+//■[ 日付フォーマット関数 ]
+const formatDateForChart = (dateStr: string): string => {
+  try {
+    const date = new Date(dateStr)
+    
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid date: ${dateStr}`)
+      return dateStr
+    }
+    
+    // 月別表示：日のみ（1, 2, 3...）
+    return date.getDate().toString()
+  } catch (error) {
+    console.error(`Date formatting error for ${dateStr}:`, error)
+    return dateStr
+  }
+}
+
+//////////
+//■[ ツールチップ用日付フォーマット ]
+const formatDateForTooltip = (dateStr: string): string => {
+  try {
+    const date = new Date(dateStr)
+    
+    if (isNaN(date.getTime())) {
+      return dateStr
+    }
+    
+    return `${date.getMonth() + 1}月${date.getDate()}日`
+  } catch (error) {
+    console.error(`Tooltip date formatting error for ${dateStr}:`, error)
+    return dateStr
+  }
+}
+
+//////////
+//■[ カスタムツールチップ ]
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null
+
+  const originalDate = payload[0]?.payload?.originalDate || label
+
+  return (
+    <motion.div
+      className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-2xl"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="text-sm font-medium text-gray-900 mb-3 flex items-center gap-2">
+        <div className="w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full" />
+        {formatDateForTooltip(originalDate)}
+      </div>
+      
+      <div className="space-y-2">
+        {payload.map((entry: any, index: number) => {
+          const icons = {
+            paymentCount: Receipt,
+            totalAmount: CreditCard,
+            totalFees: DollarSign
+          }
+          const Icon = icons[entry.dataKey as keyof typeof icons]
+          
+          return (
+            <div key={index} className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                {Icon && <Icon className="w-3 h-3" style={{ color: entry.color }} />}
+                <span className="text-xs text-gray-600">{entry.name}</span>
+              </div>
+              <span className="text-xs font-medium" style={{ color: entry.color }}>
+                {entry.dataKey === 'paymentCount' 
+                  ? `${entry.value?.toLocaleString()}件`
+                  : `¥${entry.value?.toLocaleString()}`
+                }
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </motion.div>
+  )
+}
+
+//////////
+//■[ 欠損日0埋め処理 ]
+const fillMissingDates = (
+  statsData: PaymentStatsData[], 
+  serverPeriodInfo: { startDate: string, endDate: string }
+): PaymentStatsData[] => {
+  if (!statsData) return []
+
+  const startDate = new Date(serverPeriodInfo.startDate)
+  const endDate = new Date(serverPeriodInfo.endDate)
+
+  console.log('Period for filling:', { start: startDate, end: endDate })
+
+  // 既存データを日付でマップ化
+  const dataMap = new Map<string, PaymentStatsData>()
+  statsData.forEach(item => {
+    dataMap.set(item.date, item)
+  })
+
+  // 期間内の全日付を生成して0埋め
+  const filledData: PaymentStatsData[] = []
+  const currentDate = new Date(startDate)
+
+  while (currentDate <= endDate) {
+    const dateStr = currentDate.getFullYear() + '-' + 
+                    String(currentDate.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(currentDate.getDate()).padStart(2, '0')
+    
+    const existingData = dataMap.get(dateStr)
+    if (existingData) {
+      filledData.push(existingData)
+    } else {
+      filledData.push({
+        date: dateStr,
+        paymentCount: 0,
+        totalAmount: 0,
+        totalFees: 0
+      })
+    }
+    
+    currentDate.setDate(currentDate.getDate() + 1)
+  }
+  
+  return filledData
+}
+
+export default function PaymentChart({ data, periodInfo }:{
+  data: PaymentStatsData[]
+  periodInfo: {
+    startDate: string
+    endDate: string
+  }
+}) {
+    console.log('--PaymentChart--')
+  const [chartType, setChartType] = useState<ChartType>('combined')
+
+  //////////
+  //■[ データ前処理 ]
+  const chartData = useMemo(() => {
+    if (!data) return []
+    
+    const filledData = fillMissingDates(data, periodInfo)
+    
+    return filledData.map(item => {
+      const formattedDate = formatDateForChart(item.date)
+      
+      return {
+        ...item,
+        date: formattedDate,
+        originalDate: item.date
+      }
+    })
+  }, [data, periodInfo])
+
+  //////////
+  //■[ データ統計計算 ]
+  const stats = useMemo(() => {
+    if (!data) return { hasData: false }
+
+    const filledData = fillMissingDates(data, periodInfo)
+    
+    if (filledData.length === 0) return { hasData: false }
+    
+    const totalPaymentCount = filledData.reduce((sum, item) => sum + item.paymentCount, 0)
+    const totalAmount = filledData.reduce((sum, item) => sum + item.totalAmount, 0)
+    const totalFees = filledData.reduce((sum, item) => sum + item.totalFees, 0)
+    
+    const maxPaymentCount = Math.max(...filledData.map(item => item.paymentCount))
+    const maxAmount = Math.max(...filledData.map(item => item.totalAmount))
+    const maxFees = Math.max(...filledData.map(item => item.totalFees))
+
+    return {
+      hasData: true as const,
+      totalPaymentCount,
+      totalAmount,
+      totalFees,
+      maxPaymentCount,
+      maxAmount,
+      maxFees,
+      originalDataPoints: data.length,
+      filledDataPoints: filledData.length
+    }
+  }, [data, periodInfo])
+
+  //////////
+  //■[ データなしの場合 ]
+  if (!stats.hasData || !data || data.length === 0) {
+    return (
+      <motion.div
+        className="h-80 flex flex-col items-center justify-center text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-gray-100 to-blue-100 rounded-full flex items-center justify-center shadow-lg">
+          <BarChart3 className="w-10 h-10 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">グラフデータなし</h3>
+        <p className="text-gray-600 text-sm">
+          この期間にはグラフ表示できるデータがありません
+        </p>
+      </motion.div>
+    )
+  }
+
+  //■[ TypeScript型ガード ]
+  if (!stats.hasData) return null
+
+  //////////
+  //■[ チャートコンポーネント選択 ]
+  const renderChart = () => {
+    const commonProps = {
+      data: chartData,
+      margin: { top: 20, right: 30, left: 20, bottom: 20 }
+    }
+
+    switch (chartType) {
+      case 'paymentCount':
+        return (
+          <AreaChart {...commonProps}>
+            <defs>
+              <linearGradient id="paymentCountGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.05}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.5} />
+            <XAxis 
+              dataKey="date" 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `${value}件`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="paymentCount"
+              stroke="#3B82F6"
+              strokeWidth={3}
+              fill="url(#paymentCountGradient)"
+              animationDuration={1500}
+            />
+          </AreaChart>
+        )
+
+      case 'totalAmount':
+        return (
+          <AreaChart {...commonProps}>
+            <defs>
+              <linearGradient id="totalAmountGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#10B981" stopOpacity={0.05}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.5} />
+            <XAxis 
+              dataKey="date" 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `¥${value.toLocaleString()}`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="totalAmount"
+              stroke="#10B981"
+              strokeWidth={3}
+              fill="url(#totalAmountGradient)"
+              animationDuration={1500}
+            />
+          </AreaChart>
+        )
+
+      case 'totalFees':
+        return (
+          <ComposedChart {...commonProps}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.5} />
+            <XAxis 
+              dataKey="date" 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `¥${value.toLocaleString()}`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar
+              dataKey="totalFees"
+              fill="#F59E0B"
+              radius={[4, 4, 0, 0]}
+              animationDuration={1500}
+            />
+          </ComposedChart>
+        )
+
+      default: // combined
+        return (
+          <ComposedChart {...commonProps}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.5} />
+            <XAxis 
+              dataKey="date" 
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis 
+              yAxisId="left"
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => value.toLocaleString()}
+            />
+            <YAxis 
+              yAxisId="right"
+              orientation="right"
+              stroke="#6B7280" 
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `¥${value.toLocaleString()}`}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar
+              yAxisId="right"
+              dataKey="totalFees"
+              fill="#F59E0B"
+              opacity={0.7}
+              radius={[2, 2, 0, 0]}
+              animationDuration={1000}
+            />
+            <Line
+              yAxisId="left"
+              type="monotone"
+              dataKey="paymentCount"
+              stroke="#3B82F6"
+              strokeWidth={3}
+              dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, fill: '#3B82F6' }}
+              animationDuration={1500}
+            />
+            <Line
+              yAxisId="right"
+              type="monotone"
+              dataKey="totalAmount"
+              stroke="#10B981"
+              strokeWidth={3}
+              dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+              activeDot={{ r: 6, fill: '#10B981' }}
+              animationDuration={1500}
+            />
+          </ComposedChart>
+        )
+    }
+  }
+
+  return (
+    <motion.div
+      className="w-full"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      {/* チャート切り替えタブ */}
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+        {[
+          { key: 'combined', label: '複合表示', icon: TrendingUp },
+          { key: 'paymentCount', label: '決済件数', icon: Receipt },
+          { key: 'totalAmount', label: '決済金額', icon: CreditCard },
+          { key: 'totalFees', label: '手数料', icon: DollarSign }
+        ].map((tab) => (
+          <motion.button
+            key={tab.key}
+            onClick={() => setChartType(tab.key as ChartType)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+              chartType === tab.key
+                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
+                : 'bg-white/40 hover:bg-white/60 text-gray-700 border border-white/50'
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <tab.icon className="w-4 h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+          </motion.button>
+        ))}
+      </div>
+
+      {/* メインチャート */}
+      <motion.div
+        className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-white/50"
+        key={chartType}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="h-80 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            {renderChart()}
+          </ResponsiveContainer>
+        </div>
+      </motion.div>
+
+      {/* データサマリー */}
+      {stats.hasData && (
+        <motion.div
+          className="mt-6 grid grid-cols-3 gap-4"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <div className="text-center bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/40">
+            <div className="text-lg font-bold text-blue-600">
+              {stats.maxPaymentCount ? stats.maxPaymentCount.toLocaleString() : '0'}件
+            </div>
+            <div className="text-xs text-gray-600">最大決済件数</div>
+          </div>
+          
+          <div className="text-center bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/40">
+            <div className="text-lg font-bold text-green-600">
+              ¥{stats.maxAmount ? stats.maxAmount.toLocaleString() : '0'}
+            </div>
+            <div className="text-xs text-gray-600">最大決済金額</div>
+          </div>
+          
+          <div className="text-center bg-white/30 backdrop-blur-sm rounded-xl p-3 border border-white/40">
+            <div className="text-lg font-bold text-orange-600">
+              ¥{stats.maxFees ? stats.maxFees.toLocaleString() : '0'}
+            </div>
+            <div className="text-xs text-gray-600">最大手数料</div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* 期間情報 */}
+      <motion.div
+        className="mt-4 text-center text-xs text-gray-500"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+      >
+        月間データ（日別表示）
+        {stats.hasData && stats.filledDataPoints && (
+          <>
+            • 実データ{stats.originalDataPoints}点
+            {stats.originalDataPoints !== stats.filledDataPoints && (
+              <span className="text-blue-600 ml-1">
+                • 0埋め{stats.filledDataPoints - stats.originalDataPoints}点
+              </span>
+            )}
+            • 全{stats.filledDataPoints}ポイント表示
+          </>
+        )}
+        {periodInfo && (
+          <div className="mt-1 text-gray-400">
+            期間: {periodInfo.startDate} 〜 {periodInfo.endDate}
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  )
+}

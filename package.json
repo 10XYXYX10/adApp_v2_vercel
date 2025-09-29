@@ -9,19 +9,41 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.887.0",
+    "@prisma/client": "^6.15.0",
+    "@tabler/icons-react": "^3.34.1",
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.3",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "framer-motion": "^12.23.12",
+    "googleapis": "^160.0.0",
+    "install": "^0.13.0",
+    "jose": "^6.1.0",
+    "lucide-react": "^0.542.0",
+    "next": "15.5.2",
+    "nodemailer": "^7.0.6",
+    "npm": "^11.6.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.2"
+    "recharts": "^3.2.0",
+    "tailwind-merge": "^3.3.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "@eslint/eslintrc": "^3"
+    "prisma": "^6.15.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "wrangler": "^4.40.0"
   }
 }

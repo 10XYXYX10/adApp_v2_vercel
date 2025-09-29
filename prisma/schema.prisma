@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+  //■[ prisma関係の型推論が一切機能しなくなるエラー ]
+  //・以下をコメントアウトして「npx prisma migrate dev」を実行したら解決した
+  //output   = "../src/generated/prisma" 
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザー（広告主）
+model User {
+  id                     Int      @id @default(autoincrement())
+  userType               String // admin or advertiser
+  name                   String   @unique //氏名
+  birthDate              DateTime // 生年月日（年齢確認用）
+  hashedPassword         String
+  email                  String   @unique
+  verifiedEmail          Boolean  @default(false)
+  authenticationPassword String
+
+  // 事業者情報
+  businessType       String? // individual/corporate/null
+  companyName        String? // 社名/屋号
+  representativeName String? // 代表者氏名
+  businessNumber     String? // 事業者登録番号(optional)
+
+  // アカウント状態
+  isActive    Boolean   @default(false)
+  lastLoginAt DateTime?
+  amount      Decimal   @default(0) @db.Decimal(10, 2) // 総ポイント残高
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  points         Point[]
+  advertisements Advertisement[]
+  mediaFiles     MediaFile[]
+  payments       Payment[]
+  notifications  Notification[]
+  supports       Support[]
+  Address        Address[]
+  Phone          Phone?
+  AdStats        AdStats[]
+
+  @@map("users")
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+
+  // 住所情報（国際対応）
+  // ■[ Address Validation Strategy ]
+  // ・Phase1: 日本国内限定 - 無料の日本郵便番号API利用
+  // ・Phase2: 海外展開時 - 有料のGoogle Places API追加
+  // ・Schema: 国際対応済み（将来拡張可能）
+  country      String? // 国（Phase1: "日本"固定, Phase2: 選択式）
+  postalCode   String? // 郵便番号（Phase1: 日本形式, Phase2: 国別形式）
+  state        String? // 都道府県/州
+  city         String? // 市区町村
+  addressLine1 String? // 住所1行目
+  addressLine2 String? // 住所2行目(optional)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Phone {
+  id                Int      @id @default(autoincrement())
+  hashedPhoneNumber String //末尾4字以外ハッシュ化
+  userId            Int      @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ユーザーサポート・問い合わせ（メインチケット）
+model Support {
+  id          Int       @id @default(autoincrement())
+  title       String
+  status      String    @default("open") // open/in_progress/closed
+  priority    String    @default("medium") // low/medium/high
+  category    String // payment/advertisement/technical/other
+  respondedAt DateTime? // adminが返信したら現在時刻、advertiserが返信したらnull
+  respondedBy Int? // 返信した管理者ID（nullable）
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  userId   Int
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages SupportMessage[]
+
+  @@map("supports")
+}
+
+// サポートメッセージ（チャット履歴）
+model SupportMessage {
+  id         Int    @id @default(autoincrement())
+  content    String @db.Text
+  senderType String // user/admin
+  senderId   Int // userId or adminId
+
+  createdAt DateTime @default(now())
+
+  // リレーション
+  supportId Int
+  support   Support @relation(fields: [supportId], references: [id], onDelete: Cascade)
+
+  @@index([supportId, createdAt]) // 時系列順取得用
+  @@map("support_messages")
+}
+
+// ポイント購入・消費・返金履歴
+model Point {
+  id          Int     @id @default(autoincrement())
+  type        String // purchase/consume/refund
+  amount      Decimal @db.Decimal(10, 2) // 加減算ポイント数
+  description String // 取引内容
+  //ipn_callback_urlでの処理失敗時、整合性を保つべく、checkCryptoPaymentStatusでもDB更新処理を実装。
+  //その際の、処理タイミングがバッティングして、ipn_callback_url と checkCryptoPaymentStatus で更新処理が2度走るのを回避する為に使用。
+  //「paymentId」がuuidでないと、破綻する、、、いや、Payment.idはautoincrement＝一意になる
+  uniqueKey   String  @unique // payment-{paymentId}, consume-{datetime+random}, refund-{datetime+random}
+
+  // リレーション
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paymentId Int? // nullable, 購入時のみ
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("points")
+}
+
+// 広告情報
+model Advertisement {
+  id              Int     @id @default(autoincrement())
+  adType          String // priority/overlay/preroll/youtube-short/youtube-long
+  status          String  @default("draft") // draft/pending/approved/rejected/active/paused
+  verified        Boolean @default(false)
+  budget          Decimal @db.Decimal(10, 2) // 設定予算
+  remainingBudget Decimal @db.Decimal(10, 2) // 残り予算
+  targetId        String? // 記事ID or YouTubeID
+  destinationUrl  String? // 遷移先URL(nullable)
+
+  verifiedAt       DateTime?
+  ytVideoCheckedAt DateTime? //12時間おきに検閲
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // リレーション
+  userId      Int
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaFileId Int? // nullable
+  mediaFile   MediaFile? @relation(fields: [mediaFileId], references: [id])
+  adStats     AdStats[]
+
+  @@map("advertisements")
+}
+
+// 画像・動画素材管理
+model MediaFile {
+  id          Int     @id @default(autoincrement())
+  filePath    String //まずは試しにR2で運用 
+  filePathV2  String? //将来的に、コストが嵩むようなら、レンタルサーバーを借り、Wordpressをストレージサーバー代わりに
+  mimeType    String // image/video
+  fileSize    Int
+  destination String // wp,r2
+
+  createdAt DateTime @default(now())
+
+  // リレーション
+  userId         Int
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  advertisements Advertisement[]
+
+  @@map("media_files")
+}
+
+// 決済履歴
+model Payment {
+  id             Int       @id @default(autoincrement())
+  orderId        String    @unique // アプリ生成の一意ID
+  provider       String // ccbill/nowpayments
+  paymentMethod  String // creditcard/bitcoin/ethereum/Litecoin
+  transactionId  String?   @unique // プロバイダー側のID            -------追加：未反映！！！！！！----------
+  purchaseAmount Decimal   @db.Decimal(10, 2) //購入金額
+  totalAmount    Decimal   @db.Decimal(10, 2) //手数料込
+  currency       String // BTC/ETH/Litecoin
+  status         String    @default("pending") // pending/completed/failed/expired
+  expiredAt      DateTime? // 決済有効期限
+  metadata       Json? // プロバイダー固有データ
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  userId Int
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points Point[]
+
+  @@map("payments")
+}
+
+// ユーザー通知
+model Notification {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String  @db.Text
+  isRead      Boolean @default(false)
+  type        String? // payment/advertisement/system/other
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model AdStats {
+  id          Int      @id @default(autoincrement())
+  date        DateTime @db.Date // 統計日付
+  impressions Int      @default(0) // 表示数
+  clicks      Int      @default(0) // クリック数
+  spentPoints Decimal  @default(0) @db.Decimal(10, 2) // 消費ポイント
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  advertisementId Int
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+
+  userId Int // 追加：効率化のため
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // インデックス最適化
+  @@unique([advertisementId, date])
+  @@index([userId, date]) // ユーザー別統計用
+  @@map("ad_stats")
+}

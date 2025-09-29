@@ -1,0 +1,339 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/admin/[adminId]",
+      "regex": "^/admin/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/notification",
+      "regex": "^/admin/([^/]+?)/notification(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/notification(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/notification/create",
+      "regex": "^/admin/([^/]+?)/notification/create(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/notification/create(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/notification/[notificationId]",
+      "regex": "^/admin/([^/]+?)/notification/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId",
+        "nxtPnotificationId": "nxtPnotificationId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/notification/(?<nxtPnotificationId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/payment",
+      "regex": "^/admin/([^/]+?)/payment(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/payment(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/review",
+      "regex": "^/admin/([^/]+?)/review(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/review(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/review/adStats",
+      "regex": "^/admin/([^/]+?)/review/adStats(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/review/adStats(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/review/[adId]",
+      "regex": "^/admin/([^/]+?)/review/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId",
+        "nxtPadId": "nxtPadId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/review/(?<nxtPadId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/support",
+      "regex": "^/admin/([^/]+?)/support(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/support(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/support/[supportId]",
+      "regex": "^/admin/([^/]+?)/support/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId",
+        "nxtPsupportId": "nxtPsupportId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/support/(?<nxtPsupportId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/user",
+      "regex": "^/admin/([^/]+?)/user(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/user(?:/)?$"
+    },
+    {
+      "page": "/admin/[adminId]/user/[userId]",
+      "regex": "^/admin/([^/]+?)/user/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadminId": "nxtPadminId",
+        "nxtPuserId": "nxtPuserId"
+      },
+      "namedRegex": "^/admin/(?<nxtPadminId>[^/]+?)/user/(?<nxtPuserId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]",
+      "regex": "^/advertiser/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/ad",
+      "regex": "^/advertiser/([^/]+?)/ad(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/ad(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/ad/create",
+      "regex": "^/advertiser/([^/]+?)/ad/create(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/ad/create(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/ad/create/form/[adType]",
+      "regex": "^/advertiser/([^/]+?)/ad/create/form/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId",
+        "nxtPadType": "nxtPadType"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/ad/create/form/(?<nxtPadType>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/ad/stats",
+      "regex": "^/advertiser/([^/]+?)/ad/stats(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/ad/stats(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/ad/[adId]",
+      "regex": "^/advertiser/([^/]+?)/ad/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId",
+        "nxtPadId": "nxtPadId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/ad/(?<nxtPadId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/notification",
+      "regex": "^/advertiser/([^/]+?)/notification(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/notification(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/notification/[notificationId]",
+      "regex": "^/advertiser/([^/]+?)/notification/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId",
+        "nxtPnotificationId": "nxtPnotificationId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/notification/(?<nxtPnotificationId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/point",
+      "regex": "^/advertiser/([^/]+?)/point(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/point(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/point/purchase",
+      "regex": "^/advertiser/([^/]+?)/point/purchase(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/point/purchase(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/point/purchase/credit",
+      "regex": "^/advertiser/([^/]+?)/point/purchase/credit(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/point/purchase/credit(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/point/purchase/crypt",
+      "regex": "^/advertiser/([^/]+?)/point/purchase/crypt(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/point/purchase/crypt(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/point/purchase/success",
+      "regex": "^/advertiser/([^/]+?)/point/purchase/success(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/point/purchase/success(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/point/[pointId]",
+      "regex": "^/advertiser/([^/]+?)/point/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId",
+        "nxtPpointId": "nxtPpointId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/point/(?<nxtPpointId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/profile",
+      "regex": "^/advertiser/([^/]+?)/profile(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/profile(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/support",
+      "regex": "^/advertiser/([^/]+?)/support(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/support(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/support/create",
+      "regex": "^/advertiser/([^/]+?)/support/create(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/support/create(?:/)?$"
+    },
+    {
+      "page": "/advertiser/[advertiserId]/support/[supportId]",
+      "regex": "^/advertiser/([^/]+?)/support/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPadvertiserId": "nxtPadvertiserId",
+        "nxtPsupportId": "nxtPsupportId"
+      },
+      "namedRegex": "^/advertiser/(?<nxtPadvertiserId>[^/]+?)/support/(?<nxtPsupportId>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/auth/admin",
+      "regex": "^/auth/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/admin(?:/)?$"
+    },
+    {
+      "page": "/auth/advertiser",
+      "regex": "^/auth/advertiser(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/advertiser(?:/)?$"
+    },
+    {
+      "page": "/auth/resetPass",
+      "regex": "^/auth/resetPass(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/auth/resetPass(?:/)?$"
+    },
+    {
+      "page": "/contact",
+      "regex": "^/contact(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/contact(?:/)?$"
+    },
+    {
+      "page": "/legal/privacy",
+      "regex": "^/legal/privacy(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/legal/privacy(?:/)?$"
+    },
+    {
+      "page": "/legal/terms",
+      "regex": "^/legal/terms(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/legal/terms(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

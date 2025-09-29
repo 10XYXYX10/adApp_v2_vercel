@@ -1,0 +1,3 @@
+module.exports=[187747,a=>{"use strict";a.s(["useUpdateAmount",()=>d]);var b=a.i(572131),c=a.i(601758);function d(){let{updateUser:a}=(0,c.default)();return(0,b.useCallback)(b=>{a(a=>({...a,amount:b}))},[])}},30579,a=>{"use strict";a.s(["default",()=>d]);var b=a.i(187747),c=a.i(572131);let d=({amount:a})=>{let d=(0,b.useUpdateAmount)();return(0,c.useEffect)(()=>{d(a)},[]),null}}];
+
+//# sourceMappingURL=src_9a3d4dbc._.js.map

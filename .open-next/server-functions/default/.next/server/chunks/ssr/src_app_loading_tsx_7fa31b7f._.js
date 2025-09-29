@@ -1,0 +1,3 @@
+module.exports=[402747,a=>{"use strict";a.s(["default",()=>d],402747);var b=a.i(907997);function c(){return(0,b.jsx)(b.Fragment,{children:(0,b.jsx)("div",{className:"fixed inset-0 z-15 m-auto opacity-50",children:(0,b.jsx)("div",{className:"h-20 w-20 animate-spin rounded-full border-4 border-gray-600 border-t-transparent absolute inset-0 z-20 m-auto"})})})}let d=()=>(0,b.jsx)(c,{})}];
+
+//# sourceMappingURL=src_app_loading_tsx_7fa31b7f._.js.map
