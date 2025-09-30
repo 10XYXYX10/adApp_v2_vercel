@@ -88,7 +88,6 @@ export const metadata: Metadata = {
       { url: '/images/icon.png', sizes: '48x48', type: 'image/png' },
     ],
   },
-  manifest: '/manifest.json',
   verification: {
     // Google Search Console用 - 後で設定
     // google: 'your-google-verification-code',

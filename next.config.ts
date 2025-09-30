@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'pub-7414a177cb1243efaa1f1d269e3df215.r2.dev',
+        hostname: 'media.ech-ad.org',
         port: '',
         pathname: '/**',
       },

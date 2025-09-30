@@ -17,7 +17,8 @@ import {
   IconShield,
   IconSparkles
 } from '@tabler/icons-react';
-import { AuthUser } from '@/lib/types/auth/authTypes';
+import { AuthUser, UserType } from '@/lib/types/auth/authTypes';
+import SignOut from '../auth/SignOut';
 
 interface MobileMenuProps {
   user: {
@@ -74,7 +75,7 @@ const MobileMenu = ({
     {
       id: 'users',
       label: 'User Management',
-      href: `/admin/${user.id}/users`,
+      href: `/admin/${user.id}/user`,
       icon: <IconUsers size={20} />,
       description: 'ユーザー管理',
       category: 'main'
@@ -90,7 +91,7 @@ const MobileMenu = ({
     {
       id: 'notifications',
       label: 'Notifications',
-      href: `/admin/${user.id}/notifications`,
+      href: `/admin/${user.id}/notification`,
       icon: <IconBell size={20} />,
       description: 'システム通知管理',
       category: 'secondary'
@@ -135,7 +136,7 @@ const MobileMenu = ({
     {
       id: 'notifications',
       label: 'Notifications',
-      href: `/advertiser/${user.id}/notifications`,
+      href: `/advertiser/${user.id}/notification`,
       icon: <IconBell size={20} />,
       description: '通知確認',
       category: 'secondary'
@@ -210,7 +211,6 @@ const MobileMenu = ({
             `}>
               {userInitials}
             </div>
-            
             {/* ユーザータイプバッジ */}
             <div className={`
               absolute -bottom-1 -right-1 w-6 h-6 rounded-xl flex items-center justify-center shadow-lg
@@ -369,7 +369,24 @@ const MobileMenu = ({
             })}
           </div>
         </div>
+        {/* SignOut */}
+        <div className="mb-6">
+          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
+            Sign Out
+          </h4>
+          <div>
+            <div
+              onClick={onClose}
+              className={`
+                group flex items-center space-x-3 px-4 pb-3 rounded-xl cursor-pointer
+              `}
+            >   
+              <SignOut userType={user.userType as UserType}/>
+            </div>
+          </div>
+        </div>
       </div>
+      <p className='bg-red-300 h-10 w-10 p-20'>aaaaaa</p>
     </div>
   );
 };

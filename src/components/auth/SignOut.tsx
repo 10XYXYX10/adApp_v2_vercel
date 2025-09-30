@@ -22,7 +22,7 @@ const SignOut = ({
       <button
         type="submit"
         disabled={isPending}
-        className={`p-2 hover:opacity-75 inline-block my-1 ${isPending&&'cursor-not-allowed opacity-50'}`}
+        className={`p-2 hover:opacity-75 inline-block my-1 cursor-pointer ${isPending&&'cursor-not-allowed opacity-50'}`}
       >
         <IconLogout2 size={24}/>
       </button>
