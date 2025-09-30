@@ -14,7 +14,7 @@ const AuthUser = ({
     const [signUpFlag,setSignUpFlag] = useState(false);
 
     return (
-        <div className='h-screen bg-gray-200'>
+        <div className='min-h-screen bg-gray-200'>
             {signUpFlag ? (<>
                 <button 
                     onClick={()=>setSignUpFlag(false)}
@@ -22,9 +22,9 @@ const AuthUser = ({
                 >
                     ログインに切り替え
                 </button>
-                {localFlag && <SignUp userType={userType}/>}
+                { (localFlag||userType==="advertiser") && <SignUp userType={userType}/>}
             </>) : (<>
-                {localFlag&&(
+                { (localFlag||userType==="advertiser") &&(
                     <button
                         onClick={()=>setSignUpFlag(true)}
                         className='mt-5 ml-5 px-2 py-1 text-white text-sm border border-blue-600 bg-blue-500 hover:bg-blue-400 rounded-sm'

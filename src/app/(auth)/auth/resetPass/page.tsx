@@ -2,6 +2,6 @@
 import ResetPassRequest from "@/components/auth/resetPass/ResetPassRequest"
 
 const ResetPassPage = () => {
-  return  <ResetPassRequest/>
+  return <ResetPassRequest/>
 }
 export default ResetPassPage

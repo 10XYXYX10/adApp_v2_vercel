@@ -42,7 +42,7 @@ const PaymentMethodsSection = () => {
                         <h3 className="text-2xl font-bold text-white mb-4">
                             クレジットカード決済
                         </h3>
-                        <p className="text-blue-400 font-semibold mb-4">CCBill決済システム</p>
+                        {/* <p className="text-blue-400 font-semibold mb-4">CCBill決済システム</p> */}
                         
                         <div className="space-y-2 text-gray-300">
                             <div className="flex items-center justify-center space-x-2">
@@ -70,7 +70,7 @@ const PaymentMethodsSection = () => {
                         <h3 className="text-2xl font-bold text-white mb-4">
                             仮想通貨決済
                         </h3>
-                        <p className="text-orange-400 font-semibold mb-4">NOWPayments連携</p>
+                        {/* <p className="text-orange-400 font-semibold mb-4">NOWPayments連携</p> */}
                         
                         <div className="space-y-4">
                             <div className="flex justify-center space-x-4">

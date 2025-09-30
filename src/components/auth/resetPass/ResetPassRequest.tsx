@@ -41,7 +41,7 @@ export default function ResetPassRequest() {
     }
 
     return (<>
-        <div className="flex items-center justify-center mt-5">
+        <div className="flex items-center justify-center min-h-screen bg-gray-200">
             <div className="flex flex-col items-center justify-center w-full max-w-md">
                 {!state.success
                     ?(<> 
