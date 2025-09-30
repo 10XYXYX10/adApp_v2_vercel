@@ -65,7 +65,7 @@ const UserMenu = ({
 
       {/* 通知ベル */}
       <Link
-        href={`/${user.userType}/${user.id}/notifications`}
+        href={`/${user.userType}/${user.id}/notification`}
         className="group relative p-2 rounded-xl hover:bg-gray-100 transition-all duration-200 ease-in-out"
       >
         <IconBell 

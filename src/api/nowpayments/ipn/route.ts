@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     })
 
     // 本番環境では署名検証必須
-    //if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       if (!verifyIPNSignature(payload, signature)) {
         console.error('IPN signature verification failed')
         return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         )
       }
-    //}
+    }
 
     // JSONパース
     let ipnData

@@ -66,8 +66,8 @@ export const createCryptoPayment = async ({
 
     // NOWPayments API呼び出し準備
     const nowPaymentsPayload = {
-      price_amount: 5,//totalAmount ←本番環境ではこちらに,
-      price_currency: 'usd',//'jpy' ←本番環境ではこちらに,
+      price_amount: totalAmount,//totalAmount ←本番環境ではこちらに,
+      price_currency: 'jpy',// ←本番環境ではこちらに,
       pay_currency: CURRENCY_CONFIG[currency].nowPaymentsCurrency,
       order_id: orderId,
       order_description: `ポイント購入 - purchaseAmount:${purchaseAmount}, totalAmount:${totalAmount}`,

@@ -49,12 +49,22 @@ export const createPriorityAd = async ({
         
         //////////
         //■[ PriorityAdの最大配信数は10件まで ]
-        const count = await prisma.advertisement.count({
+        let count = await prisma.advertisement.count({
             where:{
-                status:'active'
+                adType:'priority'
             },
         });
         if(count>=10)return { success: false, errMsg: '現在、広告枠が埋まっています。', statusCode: 400 }
+
+        //////////
+        //■[ 1userにつき、広告の最大作成件数は10件まで ]
+        count = await prisma.advertisement.count({
+            where:{
+                userId:authUser.id
+            }
+        })
+        if(count>=10)return { success: false, errMsg: '広告枠は最大で10件まで。これ以上は作成できません。', statusCode: 400 }
+
 
         //////////
         //■[ ポイント残高確認 ]
@@ -284,6 +294,15 @@ export const createOverlayAd = async (
         }
 
         //////////
+        //■[ 1userにつき、広告の最大作成件数は10件まで ]
+        const count = await prisma.advertisement.count({
+            where:{
+                userId:authUser.id
+            }
+        })
+        if(count>=10)return { success: false, errMsg: '広告枠は最大で10件まで。これ以上は作成できません。', statusCode: 400 }
+
+        //////////
         //■[ ポイント残高確認 ]
         const targetAdvertiser = await prisma.user.findUnique({
             where: {
@@ -486,6 +505,15 @@ export const createPrerollAd = async (
         }
 
         //////////
+        //■[ 1userにつき、広告の最大作成件数は10件まで ]
+        const count = await prisma.advertisement.count({
+            where:{
+                userId:authUser.id
+            }
+        })
+        if(count>=10)return { success: false, errMsg: '広告枠は最大で10件まで。これ以上は作成できません。', statusCode: 400 }
+
+        //////////
         // ■[ ポイント残高確認 ]
         const targetAdvertiser = await prisma.user.findUnique({
             where: {
@@ -673,6 +701,15 @@ export const createYouTubeAd = async ({
         //■[ rateLimit ] ← YouTube Data APIには利用制限がある.何度も更新されれて上限数に達してしまうリスクを回避
         const rateLimitResult = await rateLimit()
         if(!rateLimitResult.success)  return {success:false, errMsg:rateLimitResult.message, statusCode:429};//429 Too Many Requests
+
+        //////////
+        //■[ 1userにつき、広告の最大作成件数は10件まで ]
+        const count = await prisma.advertisement.count({
+            where:{
+                userId:authUser.id
+            }
+        })
+        if(count>=10)return { success: false, errMsg: '広告枠は最大で10件まで。これ以上は作成できません。', statusCode: 400 }
 
         //////////
         //■[ validation ]

@@ -89,8 +89,8 @@ const MobileMenu = ({
       category: 'main'
     },
     {
-      id: 'notifications',
-      label: 'Notifications',
+      id: 'notification',
+      label: 'Notification',
       href: `/admin/${user.id}/notification`,
       icon: <IconBell size={20} />,
       description: 'システム通知管理',
@@ -134,8 +134,8 @@ const MobileMenu = ({
       isBeta: true
     },
     {
-      id: 'notifications',
-      label: 'Notifications',
+      id: 'notification',
+      label: 'Notification',
       href: `/advertiser/${user.id}/notification`,
       icon: <IconBell size={20} />,
       description: '通知確認',
@@ -335,7 +335,7 @@ const MobileMenu = ({
           <div className="space-y-1">
             {secondaryItems.map((item, index) => {
               const active = isActive(item.href);
-              const showNotificationBadge = item.id === 'notifications' && notificationCount > 0;
+              const showNotificationBadge = item.id === 'notification' && notificationCount > 0;
               
               return (
                 <Link

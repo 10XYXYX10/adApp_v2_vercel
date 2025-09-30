@@ -457,7 +457,7 @@ export default function PrerollAdContent({ advertisement, refreshTrigger }: Prop
             <div>
               <div className="text-xs text-gray-600 mb-1">表示効果</div>
               <div className="text-sm text-green-700 bg-green-50 rounded-lg p-2">
-                動画再生前の30秒間確実に表示され、強力なブランド認知効果を期待できます
+                10秒間確実に表示！最大で30秒表示！強力なブランド認知効果を期待できます
               </div>
             </div>
           </div>
