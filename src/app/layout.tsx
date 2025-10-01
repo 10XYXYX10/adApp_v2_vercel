@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import GoogleAnalytics from "@/components/head/GoogleAnalytics";
 
+const gaId = process.env.NEXT_PUBLIC_GA_ID as string;
 const title = 'ECH AD - 100円から即配信｜アダルト広告対応！Youtube動画も審査なしで宣伝可能！'
 const description = `ECH ADは成人向けコンテンツを含む広告配信に特化したプラットフォーム。大手では取り扱い困難な広告も100円から配信可能です。YouTube宣伝は審査不要で即配信、4種類の広告形式から選択でき、クレジットカード・仮想通貨両対応。リアルタイム統計で効果を即座に確認。低コスト・高速配信で広告効果を最大化します。`
 const appUrl = process.env.NEXT_PUBLIC_APP_URL as string;
@@ -143,11 +144,9 @@ export default function RootLayout({
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
       </head>
       <body>
+        <GoogleAnalytics gaId={gaId}/>
         {children}
       </body>
-      {process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID && (
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID} />
-      )}
     </html>
   );
 }
