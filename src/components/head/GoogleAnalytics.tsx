@@ -9,9 +9,9 @@ declare global {
     gtag: (
       command: 'config' | 'event' | 'js',
       targetId: string,
-      config?: Record<string, any>
+      config?: Record<string, unknown>
     ) => void
-    dataLayer: any[]
+    dataLayer: Record<string, unknown>[]
   }
 }
 
@@ -31,10 +31,6 @@ export default function GoogleAnalytics({
       })
     }
   }, [pathname, searchParams])
-
-  if (!gaId) {
-    return null
-  }
 
   return (
     <>

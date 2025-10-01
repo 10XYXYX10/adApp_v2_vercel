@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import GoogleAnalytics from "@/components/head/GoogleAnalytics";
+import { Suspense } from "react";
 
 const gaId = process.env.NEXT_PUBLIC_GA_ID as string;
 const title = 'ECH AD - 100円から即配信｜アダルト広告対応！Youtube動画も審査なしで宣伝可能！'
@@ -144,7 +145,9 @@ export default function RootLayout({
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
       </head>
       <body>
-        <GoogleAnalytics gaId={gaId}/>
+        <Suspense fallback={null}>
+          <GoogleAnalytics gaId={gaId}/>
+        </Suspense>
         {children}
       </body>
     </html>
