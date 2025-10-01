@@ -3,6 +3,7 @@ import Script from 'next/script'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 
+const gaId = process.env.NEXT_PUBLIC_GA_ID ? process.env.NEXT_PUBLIC_GA_ID : "G-4GFQX9TP1V";// ここで直接読み込む
 // 型定義を追加
 declare global {
   interface Window {
@@ -15,11 +16,7 @@ declare global {
   }
 }
 
-export default function GoogleAnalytics({
-    gaId
-}:{
-    gaId: string
-}) {
+export default function GoogleAnalytics() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
