@@ -5,20 +5,36 @@ import crypto from 'crypto'
 
 const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET as string
 
+// NOWPayments IPNデータの型定義
+interface NOWPaymentsIPNData {
+  payment_id: string
+  payment_status: string
+  order_id?: string
+  price_amount?: number
+  price_currency?: string
+  pay_amount?: number
+  pay_currency?: string
+  actually_paid?: number
+  outcome_amount?: number
+  outcome_currency?: string
+  [key: string]: unknown
+}
+
 // オブジェクトを再帰的にソート（NOWPayments公式仕様）
-const sortObject = (obj: any): any => {
+const sortObject = (obj: Record<string, unknown>): Record<string, unknown> => {
   return Object.keys(obj)
     .sort()
-    .reduce((result: any, key) => {
-      result[key] = obj[key] && typeof obj[key] === 'object' 
-        ? sortObject(obj[key]) 
-        : obj[key]
+    .reduce((result: Record<string, unknown>, key) => {
+      const value = obj[key]
+      result[key] = value && typeof value === 'object' && !Array.isArray(value)
+        ? sortObject(value as Record<string, unknown>)
+        : value
       return result
     }, {})
 }
 
 // NOWPayments IPN署名検証
-const verifyIPNSignature = (body: any, signature: string): boolean => {
+const verifyIPNSignature = (body: NOWPaymentsIPNData, signature: string): boolean => {
   try {
     if (!ipnSecret) {
       console.error('NOWPAYMENTS_IPN_SECRET not configured')
@@ -26,7 +42,7 @@ const verifyIPNSignature = (body: any, signature: string): boolean => {
     }
 
     // ★重要: ボディをソートしてからJSON文字列化
-    const sortedBody = sortObject(body)
+    const sortedBody = sortObject(body as Record<string, unknown>)
     const payload = JSON.stringify(sortedBody)
     
     const hmac = crypto.createHmac('sha512', ipnSecret)
