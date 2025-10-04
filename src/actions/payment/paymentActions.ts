@@ -119,6 +119,8 @@ export const checkPendingPayments = async ({
         // 期限切れチェック
         const isExpired = payment.expiredAt && new Date() > payment.expiredAt
 
+          if(payment.id===4)console.log(`isExpired:${String(isExpired)}`)
+
         // NOWPayments API で状況確認
         if (payment.provider === 'nowpayments' && payment.transactionId) {
           try {
@@ -132,7 +134,7 @@ export const checkPendingPayments = async ({
 
             if (response.ok) {
               const nowPaymentsStatus = await response.json()
-              
+                if(payment.id===4)console.log(`nowPaymentsStatus.payment_status:${nowPaymentsStatus.payment_status}`)
               switch (nowPaymentsStatus.payment_status) {
                 case 'finished':
                 case 'confirmed':
@@ -148,6 +150,7 @@ export const checkPendingPayments = async ({
                 default:
                   dbStatus = 'pending'
               }
+              if(dbStatus==='pending'&&isExpired)dbStatus="expired";// ← 追加：これが無いと、5日経過して、expiredになっても、pendingのまま
             } else {
               if (isExpired) dbStatus = 'expired'
             }
@@ -159,6 +162,8 @@ export const checkPendingPayments = async ({
           // CCBillは後で実装
           if (isExpired) dbStatus = 'expired'
         }
+
+          if(payment.id===4)console.log(`dbStatus:${dbStatus}`)
 
         // ステータス変更があった場合のDB更新
         if (dbStatus !== 'pending') {

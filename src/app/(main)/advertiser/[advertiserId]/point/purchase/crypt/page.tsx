@@ -47,9 +47,11 @@ export default async function PointPurchaseCryptPage({ params }: Props) {
                     <div>
                         <h3 className="font-semibold text-green-800 mb-2">対応通貨</h3>
                         <ul className="text-green-700 space-y-1">
-                            <li>• Bitcoin (BTC)</li>
-                            <li>• Ethereum (ETH)</li>
-                            <li>• Litecoin (LTC) - 推奨</li>
+                            <li>• Bitcoin (ネットワーク:BTC)</li>
+                            <li>• Ethereum (ネットワーク:ETH)</li>
+                            <li>• USDC (ネットワーク:ETH/ERC-20)</li>
+                            <li>• USDC (ネットワーク:Polygon)</li>
+                            <li>• Litecoin (ネットワーク:LTC) - 推奨</li>
                         </ul>
                     </div>
                     <div>

@@ -195,7 +195,7 @@ model Payment {
   transactionId  String?   @unique // プロバイダー側のID            -------追加：未反映！！！！！！----------
   purchaseAmount Decimal   @db.Decimal(10, 2) //購入金額
   totalAmount    Decimal   @db.Decimal(10, 2) //手数料込
-  currency       String // BTC/ETH/Litecoin
+  currency       String // BTC/ETH/Litecoin/USDT/USDC
   status         String    @default("pending") // pending/completed/failed/expired
   expiredAt      DateTime? // 決済有効期限
   metadata       Json? // プロバイダー固有データ

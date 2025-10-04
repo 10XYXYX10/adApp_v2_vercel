@@ -5,14 +5,30 @@ import crypto from 'crypto'
 
 const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET as string
 
+// オブジェクトを再帰的にソート（NOWPayments公式仕様）
+const sortObject = (obj: any): any => {
+  return Object.keys(obj)
+    .sort()
+    .reduce((result: any, key) => {
+      result[key] = obj[key] && typeof obj[key] === 'object' 
+        ? sortObject(obj[key]) 
+        : obj[key]
+      return result
+    }, {})
+}
+
 // NOWPayments IPN署名検証
-const verifyIPNSignature = (payload: string, signature: string): boolean => {
+const verifyIPNSignature = (body: any, signature: string): boolean => {
   try {
     if (!ipnSecret) {
       console.error('NOWPAYMENTS_IPN_SECRET not configured')
       return false
     }
 
+    // ★重要: ボディをソートしてからJSON文字列化
+    const sortedBody = sortObject(body)
+    const payload = JSON.stringify(sortedBody)
+    
     const hmac = crypto.createHmac('sha512', ipnSecret)
     hmac.update(payload)
     const expectedSignature = hmac.digest('hex')
@@ -28,47 +44,20 @@ const verifyIPNSignature = (payload: string, signature: string): boolean => {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("--api/nowpayments/ipn/route.ts > POST--")
   try {
-    // リクエストボディとヘッダー取得
-    const payload = await request.text()
+    // ヘッダーとボディ取得
     const signature = request.headers.get('x-nowpayments-sig') || ''
+    const body = await request.json() // ★先にJSONパース
 
     console.log('IPN received:', {
       signature: signature ? 'present' : 'missing',
-      payloadLength: payload.length
-    })
-
-    // 本番環境では署名検証必須
-    if (process.env.NODE_ENV === 'production') {
-      if (!verifyIPNSignature(payload, signature)) {
-        console.error('IPN signature verification failed')
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        )
-      }
-    }
-
-    // JSONパース
-    let ipnData
-    try {
-      ipnData = JSON.parse(payload)
-    } catch (error) {
-      console.error('IPN JSON parse error:', error)
-      return NextResponse.json(
-        { error: 'Invalid JSON' },
-        { status: 400 }
-      )
-    }
-
-    console.log('IPN data:', {
-      paymentId: ipnData.payment_id,
-      status: ipnData.payment_status,
-      orderId: ipnData.order_id
+      paymentId: body.payment_id,
+      status: body.payment_status
     })
 
     // 必須フィールド確認
-    if (!ipnData.payment_id || !ipnData.payment_status) {
+    if (!body.payment_id || !body.payment_status) {
       console.error('Missing required IPN fields')
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -76,13 +65,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const paymentId = ipnData.payment_id
-    const paymentStatus = ipnData.payment_status
+    // ★署名検証（開発環境でもテスト推奨）
+    if (!verifyIPNSignature(body, signature)) {
+      console.error('IPN signature verification failed')
+      // ★本番では必ず401を返す
+      if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 401 }
+        )
+      }
+      console.warn('⚠️ Signature failed but proceeding (dev mode)')
+    }
+
+    const paymentId = body.payment_id
+    const paymentStatus = body.payment_status
 
     // 処理対象のステータスのみ処理
     if (!['finished', 'confirmed', 'failed', 'refunded', 'expired'].includes(paymentStatus)) {
       console.log(`Ignoring IPN status: ${paymentStatus}`)
-      return NextResponse.json({ message: 'Status ignored' })
+      return NextResponse.json({ message: 'Status ignored' }, { status: 200 })
     }
 
     // データベースで決済情報取得
@@ -101,14 +103,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 既に処理済みの場合は重複処理を避ける
+    // 既に処理済みの場合
     if (payment.status === 'completed') {
       console.log(`Payment already completed: ${paymentId}`)
-      return NextResponse.json({ message: 'Already processed' })
+      return NextResponse.json({ message: 'Already processed' }, { status: 200 })
     }
 
     // ステータス変換
-    let dbStatus: string
+    let dbStatus: 'pending' | 'completed' | 'failed' | 'expired'
     switch (paymentStatus) {
       case 'finished':
       case 'confirmed':
@@ -145,49 +147,42 @@ export async function POST(request: NextRequest) {
       if (dbStatus === 'completed') {
         const uniqueKey = `payment-${payment.id}`
         
-        // 重複防止：既存Point確認
         const existingPoint = await tx.point.findUnique({
           where: { uniqueKey }
         })
 
         if (!existingPoint) {
-          // ポイント記録作成
           await tx.point.create({
             data: {
               userId: payment.userId,
               type: 'purchase',
               amount: payment.purchaseAmount,
-              description: `仮想通貨決済によるポイント購入 (${payment.paymentMethod?.toUpperCase()}) - IPN`,
+              description: `仮想通貨決済によるポイント購入 (${payment.paymentMethod?.toUpperCase()})`,
               uniqueKey,
               paymentId: payment.id
             }
           })
 
-          // ユーザーのポイント残高更新
           await tx.user.update({
             where: { id: payment.userId },
             data: {
-              amount: {
-                increment: payment.purchaseAmount
-              }
+              amount: { increment: payment.purchaseAmount }
             }
           })
 
-          console.log(`Points awarded: ${payment.purchaseAmount} to user ${payment.userId}`)
-        } else {
-          console.log(`Points already awarded for payment: ${payment.id}`)
+          console.log(`✅ Points awarded: ${payment.purchaseAmount} to user ${payment.userId}`)
         }
       }
     })
 
-    console.log(`IPN processed successfully: ${paymentId} → ${dbStatus}`)
+    console.log(`✅ IPN processed: ${paymentId} → ${dbStatus}`)
 
-    // NOWPaymentsに成功応答
+    // ★必ず200を返す
     return NextResponse.json({ 
       message: 'IPN processed successfully',
       paymentId,
       status: dbStatus
-    })
+    }, { status: 200 })
 
   } catch (error) {
     console.error('IPN processing error:', error)
@@ -208,7 +203,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET メソッドは無効
 export async function GET() {
   return NextResponse.json(
     { error: 'Method not allowed' },

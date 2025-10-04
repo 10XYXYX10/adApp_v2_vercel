@@ -118,6 +118,8 @@ export const getPointList = async ({
             } : null
         }))
 
+            console.log(points)
+
         return {
             success: true,
             statusCode: 200,

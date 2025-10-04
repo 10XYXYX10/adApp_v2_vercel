@@ -1,12 +1,11 @@
 'use client'
 // src/components/payment/PaymentPolling.tsx
 import { useState, useEffect, useRef } from 'react'
-import { checkPendingPayments } from '@/actions/payment/paymentActions'
 import Link from 'next/link'
-//import useStore from '@/store'
 import { useUpdateAmount } from '@/hooks/point/useUpdateAmount'
 import { CompletedPaymentItem, PendingPaymentItem } from '@/lib/types/payment/paymentTypes'
 import { formatDate } from '@/lib/functions/usefulFunctions'
+import { checkPendingPayments } from '@/actions/payment/paymentActions'
 
 const getPaymentMethodName = (method: string) => {
     switch (method) {
@@ -32,7 +31,6 @@ export default function PaymentPolling({
 }:{
     advertiserId: number
 }) {
-    //const { updateUser,user } = useStore()
     const updateAmount = useUpdateAmount()
     const [pendingPayments, setPendingPayments] = useState<PendingPaymentItem[]>([])
     const [completedPayments, setCompletedPayments] = useState<CompletedPaymentItem[]>([])
@@ -73,10 +71,6 @@ export default function PaymentPolling({
                 // 残高更新があれば store を更新
                 if (result.newBalance) {
                     updateAmount(Number(result.newBalance))
-                    // updateUser({
-                    //     ...user,
-                    //     amount: Number(result.newBalance)
-                    // })
                 }
                 
                 // polling 終了条件

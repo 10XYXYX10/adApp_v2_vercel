@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { CryptoCurrency, PaymentData } from '@/lib/types/payment/crypt/cryptTypes'
 import { checkCryptoPaymentStatus } from '@/actions/payment/crypt/cryptActions'
 import { formatTime } from '@/lib/functions/usefulFunctions'
+import { QRCodeSVG } from 'qrcode.react'
 
 
 //////////
@@ -166,7 +167,6 @@ export default function CryptoPurchaseWaiting({
     }
 
 
-
     if (!hasSentPayment) {
         return (
             <div className="space-y-6" id="scrollTargetV1">
@@ -222,34 +222,6 @@ export default function CryptoPurchaseWaiting({
                     </h2>
 
                     <div className="space-y-6">
-                        {/* 送金先アドレス */}
-                        <div className="space-y-3">
-                            <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                                送金先アドレス
-                                <span className="text-red-500 text-xs ml-2">⚠️ 必ずコピーしてください</span>
-                            </label>
-                            <div className="relative">
-                                <div className="p-4 bg-gray-50 rounded-xl border-2 border-gray-200 font-mono text-sm break-all">
-                                    {paymentDataState.payAddress}
-                                </div>
-                                <button
-                                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white border border-gray-300 rounded hover:bg-blue-50 transition-colors"
-                                    onClick={() => copyToClipboard(paymentDataState.payAddress, 'address')}
-                                >
-                                    {copiedAddress ? (
-                                        <svg className="w-4 h-4 text-green-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    ) : (
-                                        <svg className="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                        </svg>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-
                         {/* 送金金額 */}
                         <div className="space-y-3">
                             <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -277,22 +249,98 @@ export default function CryptoPurchaseWaiting({
                                 </button>
                             </div>
                         </div>
+                        {/* 送金先アドレス */}
+                        <div className="space-y-3">
+                            <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                送金先アドレス
+                                <span className="text-red-500 text-xs ml-2">⚠️ 必ずコピーしてください</span>
+                            </label>
+                            <div className="relative">
+                                <div className="p-4 bg-gray-50 rounded-xl border-2 border-gray-200 font-mono text-sm break-all">
+                                    {paymentDataState.payAddress}
+                                </div>
+                                <button
+                                    className="absolute top-2 right-2 h-8 w-8 p-0 bg-white border border-gray-300 rounded hover:bg-blue-50 transition-colors"
+                                    onClick={() => copyToClipboard(paymentDataState.payAddress, 'address')}
+                                >
+                                    {copiedAddress ? (
+                                        <svg className="w-4 h-4 text-green-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
 
-                        {/* ガス代注意 */}
-                        {/* <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-xl">
+
+
+                {/* QRコードセクション */}
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span className="text-2xl">📱</span>
+                        QRコードで送金（推奨）
+                    </h2>
+                    
+                    <div className="flex flex-col items-center space-y-4">
+                        {/* QRコード表示 */}
+                        <div className="relative p-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl shadow-xl">
+                            <div className={`absolute inset-0 bg-gradient-to-r ${currencyInfo.color} rounded-2xl blur opacity-20`}></div>
+                            <div className="relative bg-white rounded-xl p-4">
+                                <QRCodeSVG
+                                    value={`${selectedCurrency}:${paymentDataState.payAddress}?amount=${paymentDataState.payAmount}`}
+                                    size={100}
+                                    level="M"
+                                    fgColor="#1f2937"
+                                    bgColor="#ffffff"
+                                />
+                            </div>
+                        </div>
+
+                        {/* QRコード使用案内 */}
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 w-full">
                             <div className="flex items-start gap-3">
-                                <div className="text-amber-500 text-lg">⚡</div>
-                                <div>
-                                    <h4 className="font-semibold text-amber-800 text-sm">ガス代について</h4>
-                                    <p className="text-amber-700 text-xs mt-1">
-                                        送金時に別途ガス代（ネットワーク手数料）が必要です。
-                                        {selectedCurrency === 'ltc' && ' Litecoinは約数十円と最も安価です。'}
-                                        {selectedCurrency === 'btc' && ' Bitcoinは数百円～数千円程度かかります。'}
-                                        {selectedCurrency === 'eth' && ' Ethereumは数百円～数千円程度かかる場合があります。'}
+                                <div className="flex-shrink-0 p-2 bg-green-500 rounded-lg">
+                                    <span className="text-white text-sm">✨</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="font-semibold text-green-900">
+                                        💡 QRコード利用を強く推奨
+                                    </h4>
+                                    <p className="text-sm text-green-800 leading-relaxed">
+                                        <strong>QRコードをスキャンすると自動的に正確な情報が入力されます。</strong>手入力によるミスを防ぐため、可能な限りQRコードをご利用ください。
                                     </p>
                                 </div>
                             </div>
-                        </div> */}
+                        </div>
+
+                        {/* ウォレットアプリ案内 */}
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 w-full">
+                            <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 p-2 bg-blue-500 rounded-lg">
+                                    <span className="text-white text-sm">💼</span>
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="font-semibold text-blue-900">
+                                        ⚠️ 暗号通貨ウォレットアプリが必要です
+                                    </h4>
+                                    <p className="text-sm text-blue-800 leading-relaxed">
+                                        このQRコードは<strong>暗号通貨ウォレットアプリ</strong>（Trust Wallet、MetaMask、Exodus等）の送金機能でスキャンしてください。
+                                    </p>
+                                    <p className="text-xs text-blue-700">
+                                        📱 カメラアプリでは決済できません
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                        </div>
                     </div>
                 </div>
 

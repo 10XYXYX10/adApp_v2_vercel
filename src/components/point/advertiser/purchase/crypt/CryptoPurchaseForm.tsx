@@ -29,6 +29,20 @@ const currencies = {
         icon: '🟠',
         features: ['最もメジャー', 'ガス代高め', '送金時間: 10分～数時間'],
         description: '最も信頼性が高いですが、ガス代と送金時間にご注意ください'
+    },
+    usdc: {
+        name: 'USD Coin(Ethereum)',
+        symbol: 'USDC',
+        icon: '🟦',
+        features: ['ネットワーク: Ethereum(ERC-20)', 'ガス代高め', '送金時間: 数分～数十分'],
+        description: 'ERC-20ベースのUSDC。＊「USD Coin(Polygon)」と間違わない様に注意'
+    },
+    usdcmatic: {
+        name: 'USD Coin(Polygon)',
+        symbol: 'USDC',
+        icon: '🟩',
+        features: ['ネットワーク: Polygon(MATIC)', 'ガス代非常に安い', '送金時間: 数秒～数分'],
+        description: 'Polygon上のUSDC。手数料が低く高速です。＊「USD Coin(Ethereum)」と間違わない様に注意'
     }
 }
 

@@ -27,8 +27,21 @@ const CURRENCY_CONFIG = {
    nowPaymentsCurrency: 'btc',
    name: 'Bitcoin',
    symbol: 'BTC'
- }
+ },
+  usdc: {
+    nowPaymentsCurrency: 'usdc',      // Ethereum ERC-20 の USDC
+    name: 'USD Coin(Ethereum)',
+    symbol: 'USDC'
+  },
+  usdcmatic: {
+    nowPaymentsCurrency: 'usdcmatic', // Polygon の USDC
+    name: 'USD Coin(Polygon)',
+    symbol: 'USDC'
+  }
 }
+
+// "usdc", //Ethereum上のUSDC「https://nowpayments.io/supported-coins/usdc-payments」
+// "usdcmatic" //Polygon上のUSDC「https://nowpayments.io/supported-coins/usdcmatic-payments」
 
 // NOWPayments API設定
 const NOW_PAYMENTS_API_URL = process.env.NOWPAYMENTS_ENDPOINT as string;
@@ -67,7 +80,7 @@ export const createCryptoPayment = async ({
     // NOWPayments API呼び出し準備
     const nowPaymentsPayload = {
       price_amount: totalAmount,//totalAmount ←本番環境ではこちらに,
-      price_currency: 'jpy',// ←本番環境ではこちらに,
+      price_currency: 'jpy',//'jpy' ← *デモでjpy指定したらerrるから注意
       pay_currency: CURRENCY_CONFIG[currency].nowPaymentsCurrency,
       order_id: orderId,
       order_description: `ポイント購入 - purchaseAmount:${purchaseAmount}, totalAmount:${totalAmount}`,
@@ -76,7 +89,7 @@ export const createCryptoPayment = async ({
       // - ユーザーが送金完了→NOWPaymentsが検知→このURLに通知
       // - サーバー間通信（ユーザーには見えない）
       // - /api/nowpayments/ipnで受信し、DBのPayment,Point,User.amountを更新
-      ipn_callback_url: `${appUrl}/api/nowpayment/ipn`,
+      ipn_callback_url: `${appUrl}/api/nowpayments/ipn`,
       // ## success_url:
       // - 決済完了後にユーザーがリダイレクトされるURL
       // - ユーザーが「決済完了しました」ボタンを押した際の遷移先

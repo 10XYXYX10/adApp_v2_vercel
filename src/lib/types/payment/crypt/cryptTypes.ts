@@ -1,7 +1,11 @@
 // src/lib/types/crypt/cryptTypes.ts
 import { PaymentStatus } from "../paymentTypes"
 
-export type CryptoCurrency = 'ltc' | 'eth' | 'btc'
+export type CryptoCurrency = 'ltc' | 'eth' | 'btc' | 'usdc' | 'usdcmatic'; //https://nowpayments.io/supported-coins
+// "usdc", //Ethereum上のUSDC「https://nowpayments.io/supported-coins/usdc-payments」
+// "usdcmatic" //Polygon上のUSDC「https://nowpayments.io/supported-coins/usdcmatic-payments」
+// "usdterc20", //Ethereum上のUSDT「https://nowpayments.io/supported-coins/usdterc20-payments」
+// "usdtmatic"//Polygon上のUSDT「https://nowpayments.io/supported-coins/usdtmatic-payments」←"Currency usdtmatic was not found"
 
 export type PaymentData = {
   id: number
