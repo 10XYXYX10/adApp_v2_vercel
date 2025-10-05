@@ -5,7 +5,7 @@ import { getUnreadNotificationCount } from '@/dal/notification/notificationFunct
 import { AuthUser } from '@/lib/types/auth/authTypes';
 
 const HeaderSC = async () => {
-    const {authUser} = await loginCheck()
+    const {authUser} = await loginCheck({updateAmountFlag:true})
     const user:AuthUser = authUser ? authUser : {id:0, name:'', userType:'advertiser', amount:0};
 
     let unreadNotificationCount = 0;

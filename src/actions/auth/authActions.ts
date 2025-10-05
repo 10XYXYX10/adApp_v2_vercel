@@ -15,7 +15,11 @@ const localFlag = process.env.NEXT_PUBLIC_APP_URL==='http://localhost:3000';
 const emailOrPasswordErr = 'The value you entered is incorrect. Please try again.';//攻撃されることを想定し、どちらが間違っていたか予測がつかないように
 
 
-export const loginCheck = async ():Promise<{
+export const loginCheck = async ({
+    updateAmountFlag
+}:{
+    updateAmountFlag:boolean
+}):Promise<{
     success: boolean
     errMsg: string
     authUser?: AuthUser
@@ -23,12 +27,28 @@ export const loginCheck = async ():Promise<{
     try{
         //////////
         //■[ セキュリティー ]
-        const {result,data,message} = await security({readOnly:true});
-        if(!result || !data)return {success:false, errMsg:message}
+        const {result,data:authUser,message} = await security({readOnly:true});
+        if(!result || !authUser)return {success:false, errMsg:message}
+
+        //////////
+        //■[ user.amountは最新状態に ]
+        //・仮想通貨決済～アプリケーション離脱～ipn_callback_urlで決済成功～DB.user.amountは変動するがaccessToken.user.amountは更新されない
+        //・seculity({readOnly:false})としても、amountの値は検証に含まれない
+        if(updateAmountFlag){
+            const currentUser = await prisma.user.findUnique({
+                where:{
+                    id: authUser.id
+                },
+                select: {
+                    amount:true
+                }
+            });
+            if(currentUser)authUser.amount = Number(currentUser.amount);
+        }
 
         //////////
         //■[ return ]
-        return {success:true, errMsg:'', authUser:data}
+        return {success:true, errMsg:'', authUser}
     }catch(err){
         const message = err instanceof Error ?  err.message : `Internal Server Error.`;
         return {success:false, errMsg:message}
