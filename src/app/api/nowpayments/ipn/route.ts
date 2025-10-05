@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
     // データベースで決済情報取得
     const payment = await prisma.payment.findFirst({
       where: {
-        transactionId: paymentId,
+        transactionId: String(paymentId),
         provider: 'nowpayments'
       }
     })
