@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import crypto from 'crypto'
-
 const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET as string
 
 // NOWPayments IPNデータの型定義
@@ -59,6 +58,13 @@ const verifyIPNSignature = (body: NOWPaymentsIPNData, signature: string): boolea
   }
 }
 
+
+
+// --api/nowpayments/ipn/route.ts > POST--
+// IPN received: { signature: 'present', paymentId: 4684813732, status: 'confirming' }
+// NOWPAYMENTS_IPN_SECRET not configured
+// IPN signature verification failed
+
 export async function POST(request: NextRequest) {
   console.log("--api/nowpayments/ipn/route.ts > POST--")
   try {
@@ -100,7 +106,7 @@ export async function POST(request: NextRequest) {
     // 処理対象のステータスのみ処理
     if (!['finished', 'confirmed', 'failed', 'refunded', 'expired'].includes(paymentStatus)) {
       console.log(`Ignoring IPN status: ${paymentStatus}`)
-      return NextResponse.json({ message: 'Status ignored' }, { status: 200 })
+      return NextResponse.json({ message: 'Status ignored' }, { status: 400 })//200を返したら以後NowPayments側でこのエンドポイントを叩いてくれないので注意
     }
 
     // データベースで決済情報取得

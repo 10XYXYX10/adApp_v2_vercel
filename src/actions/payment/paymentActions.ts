@@ -163,8 +163,6 @@ export const checkPendingPayments = async ({
           if (isExpired) dbStatus = 'expired'
         }
 
-          if(payment.id===4)console.log(`dbStatus:${dbStatus}`)
-
         // ステータス変更があった場合のDB更新
         if (dbStatus !== 'pending') {
           await prisma.$transaction(async (tx) => {
