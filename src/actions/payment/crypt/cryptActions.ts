@@ -258,7 +258,7 @@ export const checkCryptoPaymentStatus = async ({
     }
 
     // 期限切れチェック（NOWPayments APIの結果を優先）
-    const isExpired = payment.expiredAt && new Date() > payment.expiredAt
+    const isExpired = payment.expiredAt && new Date() > payment.expiredAt;
     
     // NOWPayments側で成功している場合は期限切れでも処理続行
     if (isExpired && nowPaymentsStatus.payment_status !== 'finished' && nowPaymentsStatus.payment_status !== 'confirmed') {
