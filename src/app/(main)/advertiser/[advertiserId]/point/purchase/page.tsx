@@ -80,7 +80,7 @@ export default async function PointPurchasePage({
                                 </svg>
                             </div>
                             <h2 className="text-xl font-bold text-gray-900 mb-2">仮想通貨決済</h2>
-                            <p className="text-gray-600 mb-4">BTC, ETH, USDT, USDC, DAI, Litecoin</p>
+                            <p className="text-gray-600 mb-4">BTC, ETH, USDC(ETH), USDC(Polygon), Litecoin</p>
                             <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
                                 <p className="text-sm text-green-700">手数料: 1.5%</p>
                                 <p className="text-xs text-green-600 mt-1">推奨: Litecoin（ガス代安い）</p>

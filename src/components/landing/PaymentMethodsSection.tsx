@@ -34,44 +34,14 @@ const PaymentMethodsSection = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                {/* Credit Card Payment */}
-                <div className="bg-gradient-to-br from-blue-500/20 to-indigo-600/20 backdrop-blur-sm border border-blue-400/30 rounded-2xl p-8 hover:scale-105 transition-all duration-300">
-                    <div className="text-center">
-                        <div className="text-5xl mb-6">💳</div>
-                        <h3 className="text-2xl font-bold text-white mb-4">
-                            クレジットカード決済
-                        </h3>
-                        {/* <p className="text-blue-400 font-semibold mb-4">CCBill決済システム</p> */}
-                        
-                        <div className="space-y-2 text-gray-300">
-                            <div className="flex items-center justify-center space-x-2">
-                                <span className="w-8 h-5 bg-blue-600 rounded text-white text-xs flex items-center justify-center font-bold">V</span>
-                                <span className="w-8 h-5 bg-red-600 rounded text-white text-xs flex items-center justify-center font-bold">M</span>
-                                <span className="w-8 h-5 bg-yellow-600 rounded text-white text-xs flex items-center justify-center font-bold">A</span>
-                                <span className="w-8 h-5 bg-green-600 rounded text-white text-xs flex items-center justify-center font-bold">D</span>
-                            </div>
-                            <p className="text-sm">Visa・MasterCard・AMEX・Discover</p>
-                        </div>
-                        
-                        <div className="mt-6 p-4 bg-blue-500/10 rounded-lg">
-                            <p className="text-sm text-blue-300">
-                                成人向けサービス対応の<br/>
-                                信頼できる決済プロバイダー
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
+            <div className="grid grid-cols-1 gap-8 mb-12">
                 {/* Crypto Payment */}
-                <div className="bg-gradient-to-br from-orange-500/20 to-yellow-600/20 backdrop-blur-sm border border-orange-400/30 rounded-2xl p-8 hover:scale-105 transition-all duration-300">
+                <div className="bg-gradient-to-br from-orange-500/20 to-yellow-600/20 backdrop-blur-sm border border-orange-400/30 rounded-[50%] p-8 hover:scale-105 transition-all duration-300">
                     <div className="text-center">
                         <div className="text-5xl mb-6">₿</div>
                         <h3 className="text-2xl font-bold text-white mb-4">
                             仮想通貨決済
                         </h3>
-                        {/* <p className="text-orange-400 font-semibold mb-4">NOWPayments連携</p> */}
-                        
                         <div className="space-y-4">
                             <div className="flex justify-center space-x-4">
                                 <div className="bg-orange-500/20 px-3 py-2 rounded-lg">
@@ -83,13 +53,16 @@ const PaymentMethodsSection = () => {
                                 <div className="bg-gray-500/20 px-3 py-2 rounded-lg">
                                     <span className="text-gray-300 font-bold">LTC</span>
                                 </div>
+                                <div className="bg-gray-500/20 px-3 py-2 rounded-lg">
+                                    <span className="text-gray-300 font-bold">USDC</span>
+                                </div>
                             </div>
                         </div>
                         
-                        <div className="mt-6 p-4 bg-orange-500/10 rounded-lg">
-                            <p className="text-sm text-orange-300">
-                                匿名性重視・<br/>
-                                国際送金手数料削減
+                        <div className="mt-6 p-4 bg-orange-500/10 rounded-lg inline-block">
+                            <p className="text-sm text-orange-300 text-left">
+                                ・匿名性重視<br/>
+                                ・国際送金手数料削減
                             </p>
                         </div>
                     </div>

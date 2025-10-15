@@ -99,7 +99,6 @@ export async function GET(request: NextRequest) {
 //////////
 //■[ PUT: YouTube広告視聴完了統計更新 ]
 export async function PUT(request: NextRequest) {
-        console.log(`YOUTUBE-PUT-1`)
     try {
         //////////
         //■[ API Key認証 ]
@@ -130,7 +129,6 @@ export async function PUT(request: NextRequest) {
             )
         }
 
-        console.log(`YOUTUBE-PUT-2`)
         //////////
         //■[ 広告IDから広告タイプを取得（簡易チェック） ]
         const targetAd = await prisma.advertisement.findUnique({
@@ -213,7 +211,6 @@ export async function PUT(request: NextRequest) {
             throw err
         })
 
-        console.log(`YOUTUBE-PUT-3`)
         //////////
         //■[ 12時間以上経過したYouTube広告の検閲チェック（古い順に3件） ]
         const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000)
@@ -239,7 +236,6 @@ export async function PUT(request: NextRequest) {
             take: 3 // 3件まで
         })
 
-        console.log(`YOUTUBE-PUT-4`)
         // 検閲実行
         for (const ad of adsNeedingRecheck) {
             if (!ad.targetId) continue

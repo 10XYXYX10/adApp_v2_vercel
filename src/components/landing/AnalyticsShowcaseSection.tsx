@@ -28,7 +28,7 @@ const AnalyticsShowcaseSection = () => {
                 }`}
             >
                 {/* Section Header */}
-                <div className="text-center mb-16">
+                <div className="text-center mb-10">
                     <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
                         配信状況をリアルタイムで確認
                     </h2>
@@ -44,7 +44,7 @@ const AnalyticsShowcaseSection = () => {
                         width={1024}
                         height={787}
                         alt="リアルタイム分析ダッシュボード"
-                        className="w-full max-w-4xl mx-auto rounded-2xl shadow-2xl border border-white/10"
+                        className="w-full max-w-3xl mx-auto rounded-2xl shadow-2xl border border-white/10"
                     />
                 </div>
 
